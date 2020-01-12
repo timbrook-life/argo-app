@@ -1,0 +1,6 @@
+dependencies:
+- name: consul
+  repository: https://charts.bitnami.com/bitnami
+  version: 6.0.*
+digest: sha256:c16f387da8ad8de47dcdcc8ab006d76e15fed201267ea71dfd7e48e50b8d43e0
+generated: "2020-01-12T15:13:53.813714-08:00"

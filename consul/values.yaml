@@ -1,0 +1,7 @@
+
+consul:
+  nameOverride: "consul"
+  datacenterName: sfo2
+
+  persistence:
+    size: 2Gi
