@@ -1,0 +1,15 @@
+# Declaring the user list
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: traefik-auth
+spec:
+  digestAuth:
+    secret: traefik-auth-digest
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: traefik-auth-digest
+data:
+  usersFile: dGltYnJvb2s6dHJhZWZpazo0ZmZjODU0MjhiZDA5Y2YzZGFhMmJjYWE0Y2YxYTg1OAo=
