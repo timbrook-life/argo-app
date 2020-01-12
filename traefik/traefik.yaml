@@ -1,0 +1,67 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: ingressroutetls
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - match: Host(`example.com`)
+      kind: Rule
+      services:
+        - name: traefik-ui
+          port: 8080
+      middlewares:
+        - name: redirect-scheme-https
+  tls:
+    certResolver: staging
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: traefik-ui
+spec:
+  ports:
+    - protocol: TCP
+      name: admin
+      port: 8080
+  selector:
+    app: traefik
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traefik
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: traefik
+  template:
+    metadata:
+      labels:
+        app: traefik
+    spec:
+      serviceAccountName: traefik-ingress-controller
+      volumes:
+        - name: config
+          configMap:
+            name: traefik-config
+      containers:
+        - name: traefik
+          image: traefik:v2.1.2
+          volumeMounts:
+            - name: config
+              mountPath: /etc/traefik/
+          ports:
+            - name: web
+              containerPort: 80
+            - name: websecure
+              containerPort: 443
+            - name: admin
+              containerPort: 8080
+          resources:
+            limits:
+              cpu: "100m"
+              memory: "128Mi"

@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: traefik-config
+data:
+  traefik.yml: |
+    providers:
+      kubernetesCRD: {}
+    serversTransport:
+      insecureSkipVerify: true
+    api:
+      insecure: true
+      dashboard: true
+
+    entryPoints:
+      web:
+        address: ":80"
+
+      websecure:
+        address: ":443"
+
+    certificatesResolvers:
+      staging:
+        acme:
+          caServer: https://acme-staging-v02.api.letsencrypt.org/directory
+          email: cert@timbrook.tech
+          storage: acme.json
+          httpChallenge:
+            entryPoint: web
