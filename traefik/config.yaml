@@ -6,8 +6,10 @@ data:
   traefik.yml: |
     providers:
       kubernetesCRD: {}
+
     serversTransport:
       insecureSkipVerify: true
+
     api:
       insecure: true
       dashboard: true
@@ -24,6 +26,12 @@ data:
         acme:
           caServer: https://acme-staging-v02.api.letsencrypt.org/directory
           email: cert@timbrook.tech
-          storage: acme.json
+          storage: "acme.json"
+          httpChallenge:
+            entryPoint: web
+      le:
+        acme:
+          email: cert@timbrook.tech
+          storage: "acme_prod.json"
           httpChallenge:
             entryPoint: web

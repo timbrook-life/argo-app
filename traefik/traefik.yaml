@@ -1,13 +1,13 @@
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: ingressroutetls
+  name: traefik-dashboard-ingress
 spec:
   entryPoints:
     - web
     - websecure
   routes:
-    - match: Host(`example.com`)
+    - match: Host(`traefik.new.timbrook.dev`)
       kind: Rule
       services:
         - name: traefik-ui
@@ -15,7 +15,7 @@ spec:
       middlewares:
         - name: redirect-scheme-https
   tls:
-    certResolver: staging
+    certResolver: le
 ---
 apiVersion: v1
 kind: Service
