@@ -1,0 +1,19 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: argo-workflow
+spec:
+  entryPoints:
+    - web
+    - websecure
+  routes:
+    - match: Host(`argo.timbrook.dev`)
+      kind: Rule
+      services:
+        - name: argo-ui
+          port: 80
+      middlewares:
+        - name: redirect-scheme-https
+        # - name: home-ipwhitelist
+  tls:
+    certResolver: le

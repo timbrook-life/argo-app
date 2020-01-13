@@ -1,0 +1,77 @@
+apiVersion: argoproj.io/v1alpha1
+kind: EventSource
+metadata:
+  name: webhook-event-source
+spec:
+  type: "webhook"
+  webhook:
+    # gateway can run multiple HTTP servers. Simply define a unique port to start a new HTTP server
+    example:
+      # port to run HTTP server on
+      port: "12000"
+      # endpoint to listen to
+      endpoint: "/example"
+      # HTTP request method to allow. In this case, only POST requests are accepted
+      method: "POST"
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Gateway
+metadata:
+  name: webhook-gateway
+  labels:
+    # gateway controller with instanceId "argo-events" will process this gateway
+    gateways.argoproj.io/gateway-controller-instanceid: argo-events
+spec:
+  replica: 1
+  type: "webhook"
+  eventSourceRef:
+    name: "webhook-event-source"
+    # optional, if event source is deployed in a different namespace than the gateway
+    # namespace: "other-namespace"
+  processorPort: "9330"
+  eventProtocol:
+    type: "HTTP"
+    http:
+      port: "9300"
+  template:
+    metadata:
+      name: "webhook-gateway-http"
+      labels:
+        gateway-name: "webhook-gateway"
+    spec:
+      containers:
+        - name: "gateway-client"
+          image: "argoproj/gateway-client:v0.12-rc"
+          imagePullPolicy: "Always"
+          command: ["/bin/gateway-client"]
+        - name: "webhook-events"
+          image: "argoproj/webhook-gateway:v0.12-rc"
+          imagePullPolicy: "Always"
+          command: ["/bin/webhook-gateway"]
+      serviceAccountName: "argo-events-sa"
+  service:
+    metadata:
+      name: webhook-gateway-svc
+    spec:
+      selector:
+        gateway-name: "webhook-gateway"
+      ports:
+        - port: 12000
+          targetPort: 12000
+  watchers:
+    sensors:
+      - name: "webhook-sensor"
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: argo-workflow
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`wh.new.timbrook.dev`)
+      kind: Rule
+      services:
+        - name: webhook-gateway-svc
+          port: 12000

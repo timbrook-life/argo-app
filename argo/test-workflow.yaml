@@ -1,0 +1,13 @@
+# apiVersion: argoproj.io/v1alpha1
+# kind: Workflow
+# metadata:
+#   name: deploy-test
+# spec:
+#   entrypoint: start
+#   templates:
+#     - name: start
+#       script:
+#         image: 7imbrook/ci-deploy-tools
+#         command: [bash]
+#         source: |
+#           echo "Hello World"
